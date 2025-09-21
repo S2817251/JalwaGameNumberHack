@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Number Predictor - 3 Results</title>
+  <style>
+    :root{
+      --accent:#ffcc00;
+      --bg-start:#1a0033;
+      --bg-end:#000;
+    }
+    body{
+      margin:0;
+      font-family:Poppins, sans-serif;
+      background: radial-gradient(circle at top, var(--bg-start), var(--bg-end));
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:10px;
+    }
+
+    .card{
+      width:95%;
+      max-width:420px;
+      background: rgba(20,20,20,0.9);
+      backdrop-filter: blur(6px);
+      border-radius:12px;
+      padding:12px;
+      margin:8px 0;
+      text-align:center;
+      box-shadow: 0 0 12px rgba(255,0,255,0.12);
+    }
+
+    .logo{ width:84px; height:84px; border-radius:50%; object-fit:cover; margin:8px auto; display:block;}
+    .title{ color:var(--accent); font-weight:700; font-size:20px; text-shadow:0 0 6px var(--accent); }
+    .mr-text{ color:#fff; margin-top:6px; font-size:14px; }
+
+    .subtitle{ font-size:14px; opacity:0.9; margin-bottom:6px; }
+
+    .circle-container{
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap:8px;
+      justify-items:center;
+      margin:10px 0;
+    }
+    .circle{
+      width:44px; height:44px; border-radius:50%;
+      background: rgba(60,60,60,0.45);
+      border:1.6px solid #ff00ff;
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; color:#ddd; overflow:hidden;
+      box-shadow:0 0 8px rgba(255,0,255,0.08);
+    }
+    .circle img{ width:100%; height:100%; display:block; }
+
+    .grid{ display:grid; grid-template-columns: repeat(5,1fr); gap:10px; margin-top:8px; justify-items:center; }
+    .grid img{
+      width:52px; height:52px; border-radius:50%; cursor:pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 0 8px rgba(0,255,255,0.18);
+      display:block;
+    }
+    .grid img.clicked{ transform: scale(1.2); }
+
+    .btn{ width:100%; padding:12px; border-radius:10px; border:0; font-weight:700; cursor:pointer; margin-top:8px; }
+    .btn-yellow{ background: linear-gradient(45deg,#ffcc00,#ff9900); color:#000; box-shadow:0 0 12px rgba(255,200,0,0.5); }
+    .btn-dark{ background:#222; color:#fff; border:1px solid #555; }
+
+    /* Popup base (hidden by default) */
+    .popup {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 1200;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .popup .popup-content{
+      background: #111;
+      padding: 18px;
+      border-radius: 12px;
+      max-width: 92%;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    }
+
+    /* result images */
+    .result-images{ display:flex; gap:12px; justify-content:center; margin-bottom:8px; }
+    .result-images img{ width:64px; height:64px; border-radius:50%; box-shadow: 0 0 12px rgba(0,255,255,0.5); }
+
+    .popup .error { color: #ff6666; font-weight:700; font-size:15px; }
+
+    /* level chart full screen */
+    #levelPopup .popup-content{ background: transparent; box-shadow: none; padding:0; border-radius:0; width:100%; max-width:none; }
+    #levelPopup img{ width:100%; height:auto; max-height:95vh; display:block; margin:0 auto; border-radius:8px; }
+
+    .close-btn{ margin-top:12px; padding:8px 16px; border-radius:8px; border:0; background:#ff4444; color:#fff; font-weight:700; cursor:pointer; }
+
+    @media (max-width:360px){
+      .grid img { width:46px; height:46px; }
+      .circle { width:40px; height:40px; }
+      .result-images img { width:54px; height:54px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="card">
+    <img src="logo.png" class="logo" alt="logo">
+    <div class="title">Number Hit</div>
+    <div class="mr-text">(Jalwa Game) WinGo 1 Minute</div>
+  </div>
+
+  <!-- Input circles -->
+  <div class="card">
+    <div class="subtitle">Enter last 10 results (10th → 1st)</div>
+    <div id="inputCircles" class="circle-container">
+      <div class="circle">10th</div>
+      <div class="circle">9th</div>
+      <div class="circle">8th</div>
+      <div class="circle">7th</div>
+      <div class="circle">6th</div>
+      <div class="circle">5th</div>
+      <div class="circle">4th</div>
+      <div class="circle">3rd</div>
+      <div class="circle">2nd</div>
+      <div class="circle">1st</div>
+    </div>
+    <button class="btn btn-dark" onclick="removeLast()">← Back</button>
+  </div>
+
+  <!-- Number grid -->
+  <div class="card">
+    <div id="numberGrid" class="grid"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="card">
+    <button class="btn btn-yellow" onclick="startPrediction()">Start</button>
+  </div>
+
+  <div class="card">
+    <a href="https://linkopen19.github.io/LinkOpener/JalwaGameLink" target="_blank">
+      <button class="btn btn-yellow">OFFICIAL LINKS</button>
+    </a>
+    <button class="btn btn-yellow" onclick="openLevelChart()">LEVEL CHART</button>
+  </div>
+
+  <!-- Result / Error Popup (reused for both) -->
+  <div id="resultPopup" class="popup" aria-live="polite" role="status">
+    <div class="popup-content">
+      <div class="result-images" id="resultImages"></div>
+      <div id="popupMessage" class="subtitle"></div>
+    </div>
+  </div>
+
+  <!-- Level Chart (full-screen) -->
+  <div id="levelPopup" class="popup" aria-hidden="true">
+    <div class="popup-content">
+      <h3 style="color:var(--accent); margin:10px 0;">Level Chart</h3>
+      <img src="lvl.png" alt="Level Chart">
+      <div style="text-align:center;">
+        <button class="close-btn" onclick="closeLevelChart()">Close</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const inputCircles = document.getElementById('inputCircles').children;
+  const numberGrid = document.getElementById('numberGrid');
+  const resultPopup = document.getElementById('resultPopup');
+  const resultImages = document.getElementById('resultImages');
+  const popupMessage = document.getElementById('popupMessage');
+  const levelPopup = document.getElementById('levelPopup');
+
+  let userInput = [];
+  const labels = ["10th","9th","8th","7th","6th","5th","4th","3rd","2nd","1st"];
+
+  // create number buttons 0..9
+  for (let d = 0; d <= 9; d++) {
+    const img = document.createElement('img');
+    img.src = `assets/${d}.png`;
+    img.alt = String(d);
+    img.addEventListener('click', () => selectNumber(d, img));
+    numberGrid.appendChild(img);
+  }
+
+  function selectNumber(num, el) {
+    if (userInput.length < 10) {
+      userInput.push(num);
+      updateCircles();
+    }
+    // premium animation: enlarge briefly
+    el.classList.add('clicked');
+    setTimeout(() => el.classList.remove('clicked'), 140);
+  }
+
+  function removeLast() {
+    if (userInput.length === 0) return;
+    userInput.pop();
+    updateCircles();
+  }
+
+  function updateCircles() {
+    for (let i = 0; i < 10; i++) {
+      if (userInput[i] !== undefined) {
+        inputCircles[i].innerHTML = `<img src="assets/${userInput[i]}.png" alt="${userInput[i]}">`;
+      } else {
+        inputCircles[i].textContent = labels[i];
+      }
+    }
+  }
+
+  function startPrediction() {
+    if (userInput.length < 10) {
+      showError("Please enter last 10 results first!");
+      return;
+    }
+    const nums = userInput.slice(); // copy
+    const preds = generatePrediction(nums); // returns [p1,p2,p3]
+    showResult(preds);
+
+    // reset input as before
+    userInput = [];
+    updateCircles();
+  }
+
+  /* ---------- Deterministic 3-result predictor ----------
+     1) Primary: weighted recent frequency + streak + small periodic bonus
+     2) Secondary: periodicity detection -> diff-extrapolation -> high-score fallback
+     3) Tertiary: moving average of last 3 -> next-high-score fallback
+     All deterministic, no randomness. Ensure 3 distinct numbers.
+  */
+  function generatePrediction(nums) {
+    const n = nums.length; // expected 10
+    const score = Array(10).fill(0);
+
+    // Weighted recent frequency + streak
+    for (let i = 0; i < n; i++) {
+      const d = nums[i];
+      const base = i + 1; // older small, newer bigger
+      const recentBoost = (i === n-1 ? 3 : (i === n-2 ? 1 : 0));
+      score[d] += base + recentBoost;
+      if (i > 0 && nums[i] === nums[i-1]) score[d] += 2; // consecutive streak bonus
+    }
+
+    // small periodicity bonus per-digit (if positions show repeating gap with gcd <=5)
+    for (let d = 0; d <= 9; d++) {
+      const pos = [];
+      for (let i = 0; i < n; i++) if (nums[i] === d) pos.push(i);
+      if (pos.length >= 2) {
+        const gaps = [];
+        for (let k = 1; k < pos.length; k++) gaps.push(pos[k] - pos[k-1]);
+        const common = gaps.reduce((a,b) => gcd(a,b), gaps[0]);
+        if (common > 0 && common <= 5) score[d] += 2;
+      }
+    }
+
+    // helper to pick top digit by score, tie-break by most recent occurrence
+    function pickTopExcept(excludeSet = new Set()) {
+      let best = null, bestScore = -Infinity;
+      for (let d = 0; d <= 9; d++) {
+        if (excludeSet.has(d)) continue;
+        const s = score[d] || 0;
+        if (s > bestScore) { bestScore = s; best = d; }
+        else if (s === bestScore && s > -Infinity) {
+          // tie-break: choose the one that appeared more recently
+          const lastA = nums.lastIndexOf(best);
+          const lastB = nums.lastIndexOf(d);
+          if (lastB > lastA) best = d;
+        }
+      }
+      if (best === null) {
+        // deterministic fallback
+        for (let d = 0; d <= 9; d++) if (!excludeSet.has(d)) return d;
+      }
+      return best;
+    }
+
+    // Primary: highest scored digit
+    let primary = pickTopExcept(new Set());
+
+    // Secondary: periodicity detection
+    let secondary = null;
+    for (let p = 1; p <= 5; p++) {
+      let ok = true;
+      for (let i = p; i < n; i++) {
+        if (nums[i] !== nums[i - p]) { ok = false; break; }
+      }
+      if (ok) {
+        const cand = nums[n - p];
+        if (cand !== primary) { secondary = cand; break; }
+      }
+    }
+
+    // If not found by periodicity, try diff-extrapolation
+    if (secondary === null) {
+      const last = nums[n-1], prev = nums[n-2];
+      const diff = (last - prev + 10) % 10;
+      let cand = (last + diff) % 10;
+      if (cand !== primary) secondary = cand;
+      else {
+        cand = (last - diff + 10) % 10;
+        if (cand !== primary) secondary = cand;
+      }
+    }
+
+    // If still null, pick next-high-score excluding primary
+    if (secondary === null) secondary = pickTopExcept(new Set([primary]));
+
+    // Tertiary: moving average of last 3
+    const avg = Math.round((nums[n-3] + nums[n-2] + nums[n-1]) / 3) % 10;
+    let tertiary = avg;
+    // ensure uniqueness
+    if (tertiary === primary || tertiary === secondary) {
+      // pick next-high-score excluding primary & secondary
+      tertiary = pickTopExcept(new Set([primary, secondary]));
+    }
+
+    // Final safety: if duplicates remain, deterministic shifts
+    const seen = new Set();
+    primary = normalizeDigit(primary); seen.add(primary);
+    if (seen.has(secondary)) {
+      secondary = (primary + 3) % 10;
+    } else secondary = normalizeDigit(secondary);
+    seen.add(secondary);
+    if (seen.has(tertiary)) {
+      // try shift by +5 then lowest unused
+      let cand = (primary + 5) % 10;
+      if (!seen.has(cand)) tertiary = cand;
+      else {
+        for (let d = 0; d < 10; d++) if (!seen.has(d)) { tertiary = d; break; }
+      }
+    } else tertiary = normalizeDigit(tertiary);
+
+    return [primary, secondary, tertiary];
+  }
+
+  function normalizeDigit(x){
+    let d = Number(x) || 0;
+    d = ((d % 10) + 10) % 10;
+    return d;
+  }
+
+  function gcd(a,b){ if(!b) return a; return gcd(b, a % b); }
+
+  // show result popup (3s)
+  function showResult(pred) {
+    resultImages.innerHTML = "";
+    pred.forEach(d => {
+      const img = document.createElement('img');
+      img.src = `assets/${d}.png`;
+      img.alt = String(d);
+      resultImages.appendChild(img);
+    });
+    popupMessage.classList.remove('error');
+    popupMessage.textContent = "Next Results";
+    resultPopup.style.display = 'flex';
+
+    // auto-hide after 3s
+    setTimeout(() => { resultPopup.style.display = 'none'; }, 3000);
+  }
+
+  // show error in same popup for 2s
+  function showError(msg) {
+    resultImages.innerHTML = "";
+    popupMessage.classList.add('error');
+    popupMessage.textContent = msg;
+    resultPopup.style.display = 'flex';
+    setTimeout(() => {
+      resultPopup.style.display = 'none';
+      popupMessage.classList.remove('error');
+    }, 2000);
+  }
+
+  // level chart
+  function openLevelChart(){ levelPopup.style.display = 'flex'; levelPopup.setAttribute('aria-hidden','false'); }
+  function closeLevelChart(){ levelPopup.style.display = 'none'; levelPopup.setAttribute('aria-hidden','true'); }
+
+  // init
+  updateCircles();
+</script>
+</body>
+</html>
