@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Level Chart</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .landscape {
+      display: flex;
+      flex-direction: column; /* image ke niche button */
+      align-items: center;
+      justify-content: center;
+      transform: rotate(90deg); /* pura block landscape */
+      transform-origin: center center;
+    }
+
+    img {
+      max-width: 80vh;
+      max-height: 70vw;
+      object-fit: contain;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    button {
+      padding: 14px 26px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: darkred;
+    }
+  </style>
+</head>
+<body>
+  <div class="landscape">
+    <img src="lvl.png" alt="Level Chart">
+    <button onclick="window.location.href='predicter.html'">Close</button>
+  </div>
+</body>
+</html>

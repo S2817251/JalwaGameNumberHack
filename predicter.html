@@ -95,12 +95,6 @@
 
     .popup .error { color: #ff6666; font-weight:700; font-size:15px; }
 
-    /* level chart full screen */
-    #levelPopup .popup-content{ background: transparent; box-shadow: none; padding:0; border-radius:0; width:100%; max-width:none; }
-    #levelPopup img{ width:100%; height:auto; max-height:95vh; display:block; margin:0 auto; border-radius:8px; }
-
-    .close-btn{ margin-top:12px; padding:8px 16px; border-radius:8px; border:0; background:#ff4444; color:#fff; font-weight:700; cursor:pointer; }
-
     @media (max-width:360px){
       .grid img { width:46px; height:46px; }
       .circle { width:40px; height:40px; }
@@ -149,7 +143,7 @@
     <a href="https://linkopen19.github.io/LinkOpener/JalwaGameLink" target="_blank">
       <button class="btn btn-yellow">OFFICIAL LINKS</button>
     </a>
-    <button class="btn btn-yellow" onclick="openLevelChart()">LEVEL CHART</button>
+    <button class="btn btn-yellow" onclick="window.location.href='lvl.html'">LEVEL CHART</button>
   </div>
 
   <!-- Result / Error Popup (reused for both) -->
